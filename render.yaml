@@ -1,0 +1,31 @@
+# Render Blueprint: MockGPS API (Docker). Secrets are entered in the Render dashboard (sync: false).
+services:
+  - type: web
+    name: mockgps-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - backend/**
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      # Supabase SESSION pooler (port 5432). Render has no IPv6, so the direct db.<ref> host does not work.
+      - key: ConnectionStrings__Database
+        sync: false
+      - key: Supabase__Url
+        value: https://xjmznzcxvlzggcuxwrwe.supabase.co
+      - key: Supabase__SecretKey
+        sync: false
+      - key: Geocoding__Provider
+        value: photon
+      - key: Swagger__Enabled
+        value: "false"
