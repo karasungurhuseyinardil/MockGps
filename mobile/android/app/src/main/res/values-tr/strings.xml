@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mock GPS</string>
+    <string name="simulation_channel_name">Konum simülasyonu</string>
+    <string name="simulation_channel_description">Simüle konum aktifken gösterilir.</string>
+    <string name="simulation_notification_title">Konum simüle ediliyor</string>
+    <string name="simulation_notification_starting">Başlatılıyor…</string>
+    <string name="simulation_notification_stop">Durdur</string>
+    <string name="simulation_paused">duraklatıldı</string>
+</resources>

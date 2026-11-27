@@ -1,0 +1,113 @@
+/* Mock GPS design tokens — shared by site and admin.
+   Keep in sync with mobile/lib/core/theme/tokens.dart and docs/design-system.md. */
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --color-bg: var(--mg-bg);
+  --color-elevated: var(--mg-bg-elevated);
+  --color-glass: var(--mg-surface-glass);
+  --color-line: var(--mg-border);
+  --color-fg: var(--mg-text);
+  --color-muted: var(--mg-text-muted);
+  --color-primary: var(--mg-primary);
+  --color-primary-fg: var(--mg-primary-fg);
+  --color-simulated: var(--mg-simulated);
+  --color-success: var(--mg-success);
+  --color-warning: var(--mg-warning);
+  --color-danger: var(--mg-danger);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --ease-brand: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root {
+  --mg-bg: #f4f6f9;
+  --mg-bg-elevated: #ffffff;
+  --mg-surface-glass: rgba(255, 255, 255, 0.72);
+  --mg-border: rgba(15, 23, 42, 0.08);
+  --mg-text: #0b1220;
+  --mg-text-muted: #5b6474;
+  --mg-primary: #3457f5;
+  --mg-primary-fg: #ffffff;
+  --mg-simulated: #f2542d;
+  --mg-success: #16a34a;
+  --mg-warning: #d97706;
+  --mg-danger: #dc2626;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --mg-bg: #07090d;
+    --mg-bg-elevated: #0f131a;
+    --mg-surface-glass: rgba(20, 24, 32, 0.68);
+    --mg-border: rgba(255, 255, 255, 0.08);
+    --mg-text: #e8ecf2;
+    --mg-text-muted: #8e97a8;
+    --mg-primary: #7088ff;
+    --mg-primary-fg: #0a0f1f;
+    --mg-simulated: #ff7a5c;
+    --mg-success: #34d399;
+    --mg-warning: #fbbf24;
+    --mg-danger: #f87171;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --mg-bg: #07090d;
+  --mg-bg-elevated: #0f131a;
+  --mg-surface-glass: rgba(20, 24, 32, 0.68);
+  --mg-border: rgba(255, 255, 255, 0.08);
+  --mg-text: #e8ecf2;
+  --mg-text-muted: #8e97a8;
+  --mg-primary: #7088ff;
+  --mg-primary-fg: #0a0f1f;
+  --mg-simulated: #ff7a5c;
+  --mg-success: #34d399;
+  --mg-warning: #fbbf24;
+  --mg-danger: #f87171;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--mg-bg);
+    color: var(--mg-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--mg-primary);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--mg-primary) 25%, transparent);
+  }
+}
+
+@utility glass {
+  background: var(--mg-surface-glass);
+  border: 1px solid var(--mg-border);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

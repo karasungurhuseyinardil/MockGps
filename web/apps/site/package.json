@@ -1,0 +1,37 @@
+{
+  "name": "@mockgps/site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "react-router dev --port 5173",
+    "build": "react-router build && node scripts/sitemap.mjs",
+    "preview": "vite preview --outDir build/client --port 4173",
+    "typecheck": "react-router typegen && tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mockgps/api-client": "*",
+    "@mockgps/ui": "*",
+    "@react-router/node": "~7.18.7",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router": "~7.18.7",
+    "isbot": "^5"
+  },
+  "devDependencies": {
+    "@react-router/dev": "~7.18.7",
+    "@tailwindcss/vite": "^4.3.5",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "jsdom": "^27.4.0",
+    "tailwindcss": "^4.3.5",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.8",
+    "vitest": "^4.1.12"
+  }
+}

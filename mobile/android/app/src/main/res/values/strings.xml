@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Mock GPS</string>
+    <string name="simulation_channel_name">Location simulation</string>
+    <string name="simulation_channel_description">Shown while a simulated location is active.</string>
+    <string name="simulation_notification_title">Simulating location</string>
+    <string name="simulation_notification_starting">Starting…</string>
+    <string name="simulation_notification_stop">Stop</string>
+    <string name="simulation_paused">paused</string>
+</resources>

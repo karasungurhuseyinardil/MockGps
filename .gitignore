@@ -1,0 +1,52 @@
+# Secrets / env
+.env
+.env.*
+!.env.example
+**/env/*.json
+!**/env/*.example.json
+*.keystore
+*.jks
+key.properties
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vs/
+*.user
+*.suo
+
+# .NET
+backend/**/bin/
+backend/**/obj/
+backend/**/logs/
+backend/**/TestResults/
+
+# Node / web
+node_modules/
+web/**/dist/
+web/**/build/
+web/**/.react-router/
+web/**/coverage/
+web/**/playwright-report/
+web/**/test-results/
+*.tsbuildinfo
+
+# Flutter
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/**/*.g.dart.bak
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/app/release/
+mobile/ios/Pods/
+mobile/ios/.symlinks/
+
+# Supabase
+supabase/.branches/
+supabase/.temp/
+
+# Browser automation artifacts
+.playwright-mcp/

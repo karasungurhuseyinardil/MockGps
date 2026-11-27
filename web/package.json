@@ -1,0 +1,20 @@
+{
+  "name": "mockgps-web",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:site": "npm run dev -w @mockgps/site",
+    "dev:admin": "npm run dev -w @mockgps/admin",
+    "build": "npm run build -w @mockgps/site && npm run build -w @mockgps/admin",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "api:types": "npm run generate -w @mockgps/api-client"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
