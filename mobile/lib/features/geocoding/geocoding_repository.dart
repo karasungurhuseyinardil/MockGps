@@ -24,8 +24,14 @@ class GeocodingRepository {
 
   final ApiClient _api;
 
-  Future<List<Place>> search(String query, String lang) async {
-    final res = await _api.get<List<dynamic>>('/geocoding/search', query: {'q': query, 'lang': lang, 'limit': 6});
+  /// [near] (usually the map centre) ranks nearby places first.
+  Future<List<Place>> search(String query, String lang, {GeoPoint? near}) async {
+    final res = await _api.get<List<dynamic>>('/geocoding/search', query: {
+      'q': query,
+      'lang': lang,
+      'limit': 6,
+      if (near != null) ...{'lat': near.lat, 'lng': near.lng},
+    });
     return res.map((e) => Place.fromJson(e as Map<String, dynamic>)).toList();
   }
 

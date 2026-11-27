@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using MockGps.Application.Admin;
 using MockGps.Application.Common;
+using MockGps.Application.Geocoding;
 using MockGps.Application.Me;
 using MockGps.Domain;
 using MockGps.Domain.Entities;
@@ -88,7 +89,7 @@ public class CoreLogicTests
         var http = new HttpClient(new StubHandler(body));
         var provider = new PhotonGeocodingProvider(http, Options.Create(new GeocodingOptions()), NullLogger<PhotonGeocodingProvider>.Instance);
 
-        var results = await provider.SearchAsync("berlin", "en", 5, CancellationToken.None);
+        var results = await provider.SearchAsync("berlin", "en", 5, null, CancellationToken.None);
 
         results.Count.ShouldBe(1);
         results[0].Latitude.ShouldBe(52.5170);
@@ -98,16 +99,41 @@ public class CoreLogicTests
     }
 
     [Fact]
+    public async Task Photon_search_sends_bias_point_when_given()
+    {
+        var handler = new StubHandler("""{"features":[]}""");
+        var provider = new PhotonGeocodingProvider(new HttpClient(handler), Options.Create(new GeocodingOptions()), NullLogger<PhotonGeocodingProvider>.Instance);
+
+        await provider.SearchAsync("bingol", "tr", 5, new GeoPoint(41.0, 29.1), CancellationToken.None);
+
+        handler.LastUri!.Query.ShouldContain("lat=41&lon=29.1&zoom=10");
+    }
+
+    [Fact]
+    public void Geocoding_results_with_same_label_are_kept_once()
+    {
+        GeocodingResult R(string label, double lat) => new("Bingo", label, lat, -1.9, null, "Burkina Faso", "village");
+        var results = GeocodingService.Deduplicate([R("Bingo, Boulkiemdé, Burkina Faso", 12.1), R("bingo, boulkiemdé, burkina faso", 12.2), R("Bingöl, Türkiye", 38.9)]).ToList();
+
+        results.Select(r => r.Label).ShouldBe(["Bingo, Boulkiemdé, Burkina Faso", "Bingöl, Türkiye"]);
+    }
+
+    [Fact]
     public async Task Geocoding_http_failure_becomes_external_service_error()
     {
         var http = new HttpClient(new StubHandler("oops", HttpStatusCode.BadGateway));
         var provider = new PhotonGeocodingProvider(http, Options.Create(new GeocodingOptions()), NullLogger<PhotonGeocodingProvider>.Instance);
-        await Should.ThrowAsync<ExternalServiceException>(() => provider.SearchAsync("x", "en", 5, CancellationToken.None));
+        await Should.ThrowAsync<ExternalServiceException>(() => provider.SearchAsync("x", "en", 5, null, CancellationToken.None));
     }
 
     private sealed class StubHandler(string body, HttpStatusCode status = HttpStatusCode.OK) : HttpMessageHandler
     {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct) =>
-            Task.FromResult(new HttpResponseMessage(status) { Content = new StringContent(body, Encoding.UTF8, "application/json") });
+        public Uri? LastUri { get; private set; }
+
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
+        {
+            LastUri = request.RequestUri;
+            return Task.FromResult(new HttpResponseMessage(status) { Content = new StringContent(body, Encoding.UTF8, "application/json") });
+        }
     }
 }

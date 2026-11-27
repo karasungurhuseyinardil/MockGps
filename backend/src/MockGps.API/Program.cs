@@ -143,6 +143,7 @@ try
     app.MapControllers();
     app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous().DisableRateLimiting();
     app.MapHealthChecks("/health/ready").AllowAnonymous().DisableRateLimiting();
+    app.MapGet(AuthCallbackPage.Path, AuthCallbackPage.Render).AllowAnonymous().ExcludeFromDescription();
 
     // Warm up signing keys so the first authenticated request does not wait.
     _ = app.Services.GetRequiredService<SupabaseSigningKeys>().RefreshAsync();

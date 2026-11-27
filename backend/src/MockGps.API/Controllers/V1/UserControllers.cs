@@ -187,9 +187,12 @@ public sealed class RoutesController(IRouteService routes) : ApiControllerBase
 [EnableRateLimiting(RateLimitPolicies.Geocoding)]
 public sealed class GeocodingController(IGeocodingService geocoding) : ApiControllerBase
 {
+    /// <summary>Address search. Optional <paramref name="lat"/>/<paramref name="lng"/> (e.g. the map centre) rank nearby places first.</summary>
     [HttpGet("search")]
-    public Task<IReadOnlyList<GeocodingResult>> Search([FromQuery] string q, [FromQuery] string? lang, [FromQuery] int limit = 5, CancellationToken ct = default) =>
-        geocoding.SearchAsync(new GeocodingSearchQuery(q ?? string.Empty, lang, limit), ct);
+    public Task<IReadOnlyList<GeocodingResult>> Search(
+        [FromQuery] string q, [FromQuery] string? lang, [FromQuery] int limit = 5,
+        [FromQuery] double? lat = null, [FromQuery] double? lng = null, CancellationToken ct = default) =>
+        geocoding.SearchAsync(new GeocodingSearchQuery(q ?? string.Empty, lang, limit, lat, lng), ct);
 
     /// <summary>Address for a coordinate. Returns 204 when nothing is found.</summary>
     [HttpGet("reverse")]

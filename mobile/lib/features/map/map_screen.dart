@@ -56,6 +56,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   // --- Map annotations -------------------------------------------------------------------------
 
+  GeoPoint? _mapCenter() {
+    final target = _map?.cameraPosition?.target;
+    return target == null ? null : GeoPoint(target.latitude, target.longitude);
+  }
+
   Future<void> _onMapReady(MapLibreMapController controller) async {
     _map = controller;
     await _syncAnnotations();
@@ -224,7 +229,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               padding: const EdgeInsets.all(Space.md),
               child: Column(
                 children: [
-                  _SearchBox(onSelected: (place) {
+                  _SearchBox(near: _mapCenter, onSelected: (place) {
                     ref.read(usageTrackerProvider).track(UsageEvents.searchUsed);
                     _select(place.point, label: place.name, address: place.label, source: 'search', move: true);
                   }),
@@ -316,9 +321,12 @@ class _StatusPill extends StatelessWidget {
 }
 
 class _SearchBox extends ConsumerStatefulWidget {
-  const _SearchBox({required this.onSelected});
+  const _SearchBox({required this.onSelected, required this.near});
 
   final void Function(Place place) onSelected;
+
+  /// Current map centre, used to rank nearby results first.
+  final GeoPoint? Function() near;
 
   @override
   ConsumerState<_SearchBox> createState() => _SearchBoxState();
@@ -363,7 +371,7 @@ class _SearchBoxState extends ConsumerState<_SearchBox> {
       _error = null;
     });
     try {
-      final results = await ref.read(geocodingRepositoryProvider).search(q, ref.read(settingsProvider).user.language);
+      final results = await ref.read(geocodingRepositoryProvider).search(q, ref.read(settingsProvider).user.language, near: widget.near());
       if (mounted && request == _request) setState(() => _results = results);
     } catch (e) {
       if (mounted && request == _request) setState(() => _error = e);

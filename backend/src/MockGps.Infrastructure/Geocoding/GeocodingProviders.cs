@@ -23,7 +23,7 @@ public class GeocodingOptions
 internal abstract class HttpGeocodingProvider(HttpClient http, ILogger logger) : IGeocodingProvider
 {
     public abstract string Name { get; }
-    public abstract Task<IReadOnlyList<GeocodingResult>> SearchAsync(string query, string language, int limit, CancellationToken ct);
+    public abstract Task<IReadOnlyList<GeocodingResult>> SearchAsync(string query, string language, int limit, GeoPoint? near, CancellationToken ct);
     public abstract Task<GeocodingResult?> ReverseAsync(double latitude, double longitude, string language, CancellationToken ct);
 
     protected async Task<JsonDocument> GetJsonAsync(string url, CancellationToken ct)
@@ -63,9 +63,11 @@ internal sealed class PhotonGeocodingProvider(HttpClient http, IOptions<Geocodin
     // Photon supports a small set of languages; others fall back to local names.
     private static string Lang(string l) => l == "en" ? "en" : "default";
 
-    public override async Task<IReadOnlyList<GeocodingResult>> SearchAsync(string query, string language, int limit, CancellationToken ct)
+    public override async Task<IReadOnlyList<GeocodingResult>> SearchAsync(string query, string language, int limit, GeoPoint? near, CancellationToken ct)
     {
-        using var doc = await GetJsonAsync($"{Base}/api/?q={Uri.EscapeDataString(query)}&limit={limit}&lang={Lang(language)}", ct);
+        // zoom=10 biases towards the surrounding region (~city scale) instead of the immediate street.
+        var bias = near is { } n ? $"&lat={Inv(n.Latitude)}&lon={Inv(n.Longitude)}&zoom=10" : string.Empty;
+        using var doc = await GetJsonAsync($"{Base}/api/?q={Uri.EscapeDataString(query)}&limit={limit}&lang={Lang(language)}{bias}", ct);
         return Parse(doc.RootElement);
     }
 
@@ -102,7 +104,7 @@ internal sealed class NominatimGeocodingProvider(HttpClient http, IOptions<Geoco
     public override string Name => "nominatim";
     private string Base => options.Value.NominatimUrl.TrimEnd('/');
 
-    public override async Task<IReadOnlyList<GeocodingResult>> SearchAsync(string query, string language, int limit, CancellationToken ct)
+    public override async Task<IReadOnlyList<GeocodingResult>> SearchAsync(string query, string language, int limit, GeoPoint? near, CancellationToken ct)
     {
         using var doc = await GetJsonAsync(
             $"{Base}/search?q={Uri.EscapeDataString(query)}&format=jsonv2&addressdetails=1&limit={limit}&accept-language={language}", ct);
@@ -136,9 +138,10 @@ internal sealed class MapTilerGeocodingProvider(HttpClient http, IOptions<Geocod
     private string Base => options.Value.MapTilerUrl.TrimEnd('/');
     private string Key => Uri.EscapeDataString(options.Value.MapTilerKey ?? string.Empty);
 
-    public override async Task<IReadOnlyList<GeocodingResult>> SearchAsync(string query, string language, int limit, CancellationToken ct)
+    public override async Task<IReadOnlyList<GeocodingResult>> SearchAsync(string query, string language, int limit, GeoPoint? near, CancellationToken ct)
     {
-        using var doc = await GetJsonAsync($"{Base}/geocoding/{Uri.EscapeDataString(query)}.json?key={Key}&language={language}&limit={limit}", ct);
+        var proximity = near is { } n ? $"&proximity={Inv(n.Longitude)},{Inv(n.Latitude)}" : string.Empty;
+        using var doc = await GetJsonAsync($"{Base}/geocoding/{Uri.EscapeDataString(query)}.json?key={Key}&language={language}&limit={limit}{proximity}", ct);
         return Parse(doc.RootElement);
     }
 

@@ -6,6 +6,10 @@ abstract final class Env {
   static const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
   static const supabasePublishableKey = String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY');
   static const authRedirectUrl = String.fromEnvironment('AUTH_REDIRECT_URL', defaultValue: 'mockgps://auth-callback');
+
+  /// Where the sign-up confirmation email leads. In production a web page (API `/auth/callback`) that also
+  /// works when the email is opened on a computer; defaults to the app link.
+  static const emailConfirmUrl = String.fromEnvironment('EMAIL_CONFIRM_URL', defaultValue: authRedirectUrl);
   static const websiteUrl = String.fromEnvironment('WEBSITE_URL', defaultValue: 'https://mockgps.app');
 
   static List<String> get missing => [

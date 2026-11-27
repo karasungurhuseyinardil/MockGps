@@ -106,14 +106,14 @@ class AuthController extends Notifier<AppAuthState> {
     final res = await _auth.signUp(
       email: email.trim(),
       password: password,
-      emailRedirectTo: Env.authRedirectUrl,
+      emailRedirectTo: Env.emailConfirmUrl,
       data: {'language': language, if (displayName != null && displayName.isNotEmpty) 'display_name': displayName},
     );
     return res.session == null;
   }
 
   Future<void> resendConfirmation(String email) =>
-      _auth.resend(type: OtpType.signup, email: email.trim(), emailRedirectTo: Env.authRedirectUrl);
+      _auth.resend(type: OtpType.signup, email: email.trim(), emailRedirectTo: Env.emailConfirmUrl);
 
   Future<void> sendPasswordReset(String email) => _auth.resetPasswordForEmail(email.trim(), redirectTo: Env.authRedirectUrl);
 
