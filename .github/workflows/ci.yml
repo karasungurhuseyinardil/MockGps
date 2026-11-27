@@ -89,9 +89,11 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
+      - name: Generate Android Gradle files
+        run: flutter build apk --config-only
       - name: Kotlin unit tests (route player)
         working-directory: mobile/android
-        run: ./gradlew :app:testDebugUnitTest --console=plain
+        run: chmod +x ./gradlew && ./gradlew :app:testDebugUnitTest --console=plain
       - name: Release APK builds
         run: >
           flutter build apk --release
