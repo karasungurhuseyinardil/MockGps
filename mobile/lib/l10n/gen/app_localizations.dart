@@ -452,6 +452,24 @@ abstract class AppLocalizations {
   /// **'My real location'**
   String get mapMyLocation;
 
+  /// No description provided for @mapLocationServiceOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Location services are off. Turn on GPS to see where you are.'**
+  String get mapLocationServiceOff;
+
+  /// No description provided for @mapLocationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is needed to show where you are.'**
+  String get mapLocationPermissionDenied;
+
+  /// No description provided for @mapLocationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t get your location. Try again outdoors or with GPS on.'**
+  String get mapLocationUnavailable;
+
   /// No description provided for @mapLayers.
   ///
   /// In en, this message translates to:

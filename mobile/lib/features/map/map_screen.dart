@@ -47,6 +47,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   bool _busy = false;
   bool _addressLoading = false;
   int _addressRequest = 0;
+  GeoPoint? _myLocation;
 
   @override
   void dispose() {
@@ -79,6 +80,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     _pulse?.cancel();
     _halo = null;
     await map.clearCircles();
+
+    final me = _myLocation;
+    if (me != null) {
+      await map.addCircle(CircleOptions(
+          geometry: toLatLng(me), circleRadius: 16, circleColor: '#1A73E8', circleOpacity: 0.18));
+      await map.addCircle(CircleOptions(
+          geometry: toLatLng(me), circleRadius: 7, circleColor: '#1A73E8', circleStrokeColor: '#FFFFFF', circleStrokeWidth: 2.5));
+    }
 
     final simPoint = sim.isActive ? sim.point : null;
     if (simPoint != null) {
@@ -129,16 +138,46 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     }
   }
 
+  /// Jumps to the last known fix immediately (no waiting for GPS), then refines with a fresh fix
+  /// and marks the spot with a "you are here" dot.
   Future<void> _goToMyLocation() async {
+    final l = AppLocalizations.of(context);
     try {
+      if (!await Geolocator.isLocationServiceEnabled()) {
+        if (mounted) {
+          showMessage(context, l.mapLocationServiceOff,
+              error: true, action: SnackBarAction(label: l.commonOpenSettings, onPressed: Geolocator.openLocationSettings));
+        }
+        return;
+      }
       var permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) return;
-      final pos = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(timeLimit: Duration(seconds: 10)));
-      await _map?.animateCamera(CameraUpdate.newLatLngZoom(LatLng(pos.latitude, pos.longitude), 15));
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          showMessage(context, l.mapLocationPermissionDenied,
+              error: true, action: SnackBarAction(label: l.commonOpenSettings, onPressed: Geolocator.openAppSettings));
+        }
+        return;
+      }
+      final last = await Geolocator.getLastKnownPosition();
+      if (last != null) await _showMyLocation(GeoPoint(last.latitude, last.longitude));
+      final pos = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 10)));
+      await _showMyLocation(GeoPoint(pos.latitude, pos.longitude));
+    } on TimeoutException {
+      // Keep the last known fix if we had one.
+      if (mounted && _myLocation == null) showMessage(context, l.mapLocationUnavailable, error: true);
     } catch (e) {
       if (mounted) showError(context, e);
     }
+  }
+
+  Future<void> _showMyLocation(GeoPoint p) async {
+    if (!mounted) return;
+    _myLocation = p;
+    await _syncAnnotations();
+    final zoom = _map?.cameraPosition?.zoom ?? 0;
+    await _map?.animateCamera(CameraUpdate.newLatLngZoom(toLatLng(p), zoom < 15 ? 16 : zoom));
   }
 
   // --- Actions --------------------------------------------------------------------------------

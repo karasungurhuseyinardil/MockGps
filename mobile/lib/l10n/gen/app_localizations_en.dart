@@ -193,6 +193,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapMyLocation => 'My real location';
 
   @override
+  String get mapLocationServiceOff =>
+      'Location services are off. Turn on GPS to see where you are.';
+
+  @override
+  String get mapLocationPermissionDenied =>
+      'Location permission is needed to show where you are.';
+
+  @override
+  String get mapLocationUnavailable =>
+      'Couldn\'t get your location. Try again outdoors or with GPS on.';
+
+  @override
   String get mapLayers => 'Map style';
 
   @override

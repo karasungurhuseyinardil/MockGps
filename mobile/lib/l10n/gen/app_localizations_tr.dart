@@ -193,6 +193,18 @@ class AppLocalizationsTr extends AppLocalizations {
   String get mapMyLocation => 'Gerçek konumum';
 
   @override
+  String get mapLocationServiceOff =>
+      'Konum servisleri kapalı. Nerede olduğunu görmek için GPS\'i aç.';
+
+  @override
+  String get mapLocationPermissionDenied =>
+      'Nerede olduğunu göstermek için konum izni gerekli.';
+
+  @override
+  String get mapLocationUnavailable =>
+      'Konumun alınamadı. Açık alanda veya GPS açıkken tekrar dene.';
+
+  @override
   String get mapLayers => 'Harita stili';
 
   @override
